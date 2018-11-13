@@ -294,6 +294,18 @@ def grab_players(team):
     req = requests.get(url)
     matchup = BeautifulSoup(req.text, "html.parser")
 
+    global my_team
+    global my_players
+    global my_opponent
+    global opponent_players
+    global my_score
+    global opponent_score
+    my_team = list()
+    my_players = list()
+    my_opponent = list()
+    opponent_players = list()
+    my_score = 0
+    opponent_score = 0
     players = matchup.find_all('tr', 'player-QB-0')
     players.extend(matchup.find_all('tr', 'player-RB-0'))
     players.extend(matchup.find_all('tr', 'player-RB-1'))
