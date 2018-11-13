@@ -2,6 +2,9 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 import csv
 import io
+import os
+
+path_files = '/var/www/llfantasy.com/public_html/'
 
 
 def get_dst_data(year, week):
@@ -76,7 +79,7 @@ def get_dst_data(year, week):
         points += pa + payds
         data_file = 'data/dst_data.csv'
         # writes the stats to that position's csv file
-        with io.open(data_file, 'a', newline='') as stat_file:
+        with io.open(os.path.join(path_files, data_file), 'a', newline='') as stat_file:
             stat_writer = csv.writer(stat_file)
             # team  opp home pts Sack	Int	Saf	FR	Blk	TD	PA	PassYds
             # RushYds	TotYds

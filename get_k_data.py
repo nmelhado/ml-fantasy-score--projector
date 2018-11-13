@@ -2,6 +2,9 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 import csv
 import io
+import os
+
+path_files = '/var/www/llfantasy.com/public_html/'
 
 
 def get_k_data(year, week):
@@ -52,7 +55,7 @@ def get_k_data(year, week):
         points = int(player_stats[6]) + (3 * int(player_stats[8]))
         data_file = 'data/k_data.csv'
         # writes the stats to that position's csv file
-        with io.open(data_file, 'a', newline='') as stat_file:
+        with io.open(os.path.join(path_files, data_file), 'a', newline='') as stat_file:
             stat_writer = csv.writer(stat_file)
             stat_writer.writerow([year, week, player_stats[0],
                                   player_stats[1], player_stats[2],

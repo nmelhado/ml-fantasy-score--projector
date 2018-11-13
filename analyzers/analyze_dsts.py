@@ -1,22 +1,25 @@
 import pandas
 import pickle
 import io
+import os
 import csv
 from sklearn import linear_model
+
+path_files = '/var/www/llfantasy.com/public_html/'
 
 
 def analyze_dsts():
     '''Function that analyzes the DST data and creates a model from it.'''
     teams = {}
     opponents = {}
-    with open('data/dst_data.csv') as f:
+    with open(os.path.join(path_files, 'data/dst_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             teams[row['team']] = 0
             opponents[row['opponent']] = 0
     f.close()
 
-    with io.open('computed/dst_data.csv', 'w', newline='') as stat_file:
+    with io.open(os.path.join(path_files, 'computed/dst_data.csv'), 'w', newline='') as stat_file:
         stat_writer = csv.writer(stat_file)
         cats = ['year', 'week']
         for k, v in teams.items():
@@ -27,7 +30,7 @@ def analyze_dsts():
                      'tds', 'points_allowed', 'yards_allowed',
                      'fantasy points'])
         stat_writer.writerow(cats)
-        with open('data/dst_data.csv') as f:
+        with open(os.path.join(path_files, 'data/dst_data.csv')) as f:
             reader = csv.DictReader(f, delimiter=',')
             for row in reader:
                 teams[row['team']] = 1
@@ -48,7 +51,7 @@ def analyze_dsts():
         f.close()
     stat_file.close()
     # loading the data as a panda
-    df = pandas.read_csv('computed/dst_data.csv', delimiter=",")
+    df = pandas.read_csv(os.path.join(path_files, 'computed/dst_data.csv'), delimiter=",")
 
     # getting the dvs
     labels = ['sack', 'int', 'safeties', 'fum_rec', 'block', 'tds',
@@ -67,4 +70,4 @@ def analyze_dsts():
         regr.fit(features, dv)
 
         # serializing the model to a file
-        pickle.dump(regr, open("models/dst_" + label + ".pkl", "wb"))
+        pickle.dump(regr, open(os.path.join(path_files, "models/dst_" + label + ".pkl"), "wb"))

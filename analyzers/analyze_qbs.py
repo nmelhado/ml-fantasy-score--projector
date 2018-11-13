@@ -1,8 +1,11 @@
 import pandas
 import pickle
 import io
+import os
 import csv
 from sklearn import linear_model
+
+path_files = '/var/www/llfantasy.com/public_html/'
 
 
 def analyze_qbs():
@@ -10,7 +13,7 @@ def analyze_qbs():
     players = {}
     teams = {}
     opponents = {}
-    with open('data/qb_data.csv') as f:
+    with open(os.path.join(path_files, 'data/qb_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             players[row['name']] = 0
@@ -18,7 +21,7 @@ def analyze_qbs():
             opponents[row['opponent']] = 0
     f.close()
 
-    with io.open('computed/qb_data.csv', 'w', newline='') as stat_file:
+    with io.open(os.path.join(path_files, 'computed/qb_data.csv'), 'w', newline='') as stat_file:
         stat_writer = csv.writer(stat_file)
         cats = ['year', 'week']
         for k, v in players.items():
@@ -32,7 +35,7 @@ def analyze_qbs():
                      'rec_receptions', 'rec_yds', 'rec_tds', 'rec_2pts',
                      'fumb', 'fantasy points'])
         stat_writer.writerow(cats)
-        with open('data/qb_data.csv') as f:
+        with open(os.path.join(path_files, 'data/qb_data.csv')) as f:
             reader = csv.DictReader(f, delimiter=',')
             for row in reader:
                 players[row['name']] = 1
@@ -60,7 +63,7 @@ def analyze_qbs():
         f.close()
     stat_file.close()
     # loading the data as a panda
-    df = pandas.read_csv('computed/qb_data.csv', delimiter=",")
+    df = pandas.read_csv(os.path.join(path_files, 'computed/qb_data.csv'), delimiter=",")
 
     # getting the dvs
     labels = ['pa_yds', 'pa_tds', 'pa_int', 'pa_2pts', 'ru_yds', 'ru_tds',
@@ -81,4 +84,4 @@ def analyze_qbs():
         regr.fit(features, dv)
 
         # serializing the model to a file
-        pickle.dump(regr, open("models/qb_" + label + ".pkl", "wb"))
+        pickle.dump(regr, open(os.path.join(path_files, "models/qb_" + label + ".pkl"), "wb"))

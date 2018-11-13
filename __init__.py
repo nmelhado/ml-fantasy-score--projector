@@ -1,10 +1,12 @@
 from flask import Flask
 from flask import jsonify
+from flask import render_template
 import pickle
 import numpy as np
 import os
 import sys
 import inspect
+import datetime
 import csv
 import requests
 from bs4 import BeautifulSoup
@@ -35,75 +37,77 @@ if reevaluate:
     analyze_dsts()
     analyze_ks()
 
+path_files = '/var/www/llfantasy.com/public_html/'
+
 # getting the trained qb models from the files created by analyze_qbs()
-qb_models = {'fumbles': pickle.load(open("models/qb_fumb.pkl", "rb")),
-             'pass_2pts': pickle.load(open("models/qb_pa_2pts.pkl", "rb")),
-             'pass_int': pickle.load(open("models/qb_pa_int.pkl", "rb")),
-             'pass_tds': pickle.load(open("models/qb_pa_tds.pkl", "rb")),
-             'pass_yds': pickle.load(open("models/qb_pa_yds.pkl", "rb")),
-             'recieving_2pts': pickle.load(open("models/qb_rec_2pts.pkl", "rb")),
-             'recieving_receptions': pickle.load(open("models/qb_rec_receptions.pkl", "rb")),
-             'recieving_tds': pickle.load(open("models/qb_rec_tds.pkl", "rb")),
-             'recieving_yds': pickle.load(open("models/qb_rec_yds.pkl", "rb")),
-             'rushing_2pts': pickle.load(open("models/qb_ru_2pts.pkl", "rb")),
-             'rushing_tds': pickle.load(open("models/qb_ru_tds.pkl", "rb")),
-             'rushing_yds': pickle.load(open("models/qb_ru_yds.pkl", "rb"))}
+qb_models = {'fumbles': pickle.load(open(os.path.join(path_files, "models/qb_fumb.pkl"), "rb")),
+             'pass_2pts': pickle.load(open(os.path.join(path_files, "models/qb_pa_2pts.pkl"), "rb")),
+             'pass_int': pickle.load(open(os.path.join(path_files, "models/qb_pa_int.pkl"), "rb")),
+             'pass_tds': pickle.load(open(os.path.join(path_files, "models/qb_pa_tds.pkl"), "rb")),
+             'pass_yds': pickle.load(open(os.path.join(path_files, "models/qb_pa_yds.pkl"), "rb")),
+             'recieving_2pts': pickle.load(open(os.path.join(path_files, "models/qb_rec_2pts.pkl"), "rb")),
+             'recieving_receptions': pickle.load(open(os.path.join(path_files, "models/qb_rec_receptions.pkl"), "rb")),
+             'recieving_tds': pickle.load(open(os.path.join(path_files, "models/qb_rec_tds.pkl"), "rb")),
+             'recieving_yds': pickle.load(open(os.path.join(path_files, "models/qb_rec_yds.pkl"), "rb")),
+             'rushing_2pts': pickle.load(open(os.path.join(path_files, "models/qb_ru_2pts.pkl"), "rb")),
+             'rushing_tds': pickle.load(open(os.path.join(path_files, "models/qb_ru_tds.pkl"), "rb")),
+             'rushing_yds': pickle.load(open(os.path.join(path_files, "models/qb_ru_yds.pkl"), "rb"))}
 
 # getting the trained wr models from the files created by analyze_wrs()
-wr_models = {'fumbles': pickle.load(open("models/wr_fumb.pkl", "rb")),
-             'pass_2pts': pickle.load(open("models/wr_pa_2pts.pkl", "rb")),
-             'pass_int': pickle.load(open("models/wr_pa_int.pkl", "rb")),
-             'pass_tds': pickle.load(open("models/wr_pa_tds.pkl", "rb")),
-             'pass_yds': pickle.load(open("models/wr_pa_yds.pkl", "rb")),
-             'recieving_2pts': pickle.load(open("models/wr_rec_2pts.pkl", "rb")),
-             'recieving_receptions': pickle.load(open("models/wr_rec_receptions.pkl", "rb")),
-             'recieving_tds': pickle.load(open("models/wr_rec_tds.pkl", "rb")),
-             'recieving_yds': pickle.load(open("models/wr_rec_yds.pkl", "rb")),
-             'rushing_2pts': pickle.load(open("models/wr_ru_2pts.pkl", "rb")),
-             'rushing_tds': pickle.load(open("models/wr_ru_tds.pkl", "rb")),
-             'rushing_yds': pickle.load(open("models/wr_ru_yds.pkl", "rb"))}
+wr_models = {'fumbles': pickle.load(open(os.path.join(path_files, "models/wr_fumb.pkl"), "rb")),
+             'pass_2pts': pickle.load(open(os.path.join(path_files, "models/wr_pa_2pts.pkl"), "rb")),
+             'pass_int': pickle.load(open(os.path.join(path_files, "models/wr_pa_int.pkl"), "rb")),
+             'pass_tds': pickle.load(open(os.path.join(path_files, "models/wr_pa_tds.pkl"), "rb")),
+             'pass_yds': pickle.load(open(os.path.join(path_files, "models/wr_pa_yds.pkl"), "rb")),
+             'recieving_2pts': pickle.load(open(os.path.join(path_files, "models/wr_rec_2pts.pkl"), "rb")),
+             'recieving_receptions': pickle.load(open(os.path.join(path_files, "models/wr_rec_receptions.pkl"), "rb")),
+             'recieving_tds': pickle.load(open(os.path.join(path_files, "models/wr_rec_tds.pkl"), "rb")),
+             'recieving_yds': pickle.load(open(os.path.join(path_files, "models/wr_rec_yds.pkl"), "rb")),
+             'rushing_2pts': pickle.load(open(os.path.join(path_files, "models/wr_ru_2pts.pkl"), "rb")),
+             'rushing_tds': pickle.load(open(os.path.join(path_files, "models/wr_ru_tds.pkl"), "rb")),
+             'rushing_yds': pickle.load(open(os.path.join(path_files, "models/wr_ru_yds.pkl"), "rb"))}
 
 # getting the trained rb models from the files created by analyze_rbs()
-rb_models = {'fumbles': pickle.load(open("models/rb_fumb.pkl", "rb")),
-             'pass_2pts': pickle.load(open("models/rb_pa_2pts.pkl", "rb")),
-             'pass_int': pickle.load(open("models/rb_pa_int.pkl", "rb")),
-             'pass_tds': pickle.load(open("models/rb_pa_tds.pkl", "rb")),
-             'pass_yds': pickle.load(open("models/rb_pa_yds.pkl", "rb")),
-             'recieving_2pts': pickle.load(open("models/rb_rec_2pts.pkl", "rb")),
-             'recieving_receptions': pickle.load(open("models/rb_rec_receptions.pkl", "rb")),
-             'recieving_tds': pickle.load(open("models/rb_rec_tds.pkl", "rb")),
-             'recieving_yds': pickle.load(open("models/rb_rec_yds.pkl", "rb")),
-             'rushing_2pts': pickle.load(open("models/rb_ru_2pts.pkl", "rb")),
-             'rushing_tds': pickle.load(open("models/rb_ru_tds.pkl", "rb")),
-             'rushing_yds': pickle.load(open("models/rb_ru_yds.pkl", "rb"))}
+rb_models = {'fumbles': pickle.load(open(os.path.join(path_files, "models/rb_fumb.pkl"), "rb")),
+             'pass_2pts': pickle.load(open(os.path.join(path_files, "models/rb_pa_2pts.pkl"), "rb")),
+             'pass_int': pickle.load(open(os.path.join(path_files, "models/rb_pa_int.pkl"), "rb")),
+             'pass_tds': pickle.load(open(os.path.join(path_files, "models/rb_pa_tds.pkl"), "rb")),
+             'pass_yds': pickle.load(open(os.path.join(path_files, "models/rb_pa_yds.pkl"), "rb")),
+             'recieving_2pts': pickle.load(open(os.path.join(path_files, "models/rb_rec_2pts.pkl"), "rb")),
+             'recieving_receptions': pickle.load(open(os.path.join(path_files, "models/rb_rec_receptions.pkl"), "rb")),
+             'recieving_tds': pickle.load(open(os.path.join(path_files, "models/rb_rec_tds.pkl"), "rb")),
+             'recieving_yds': pickle.load(open(os.path.join(path_files, "models/rb_rec_yds.pkl"), "rb")),
+             'rushing_2pts': pickle.load(open(os.path.join(path_files, "models/rb_ru_2pts.pkl"), "rb")),
+             'rushing_tds': pickle.load(open(os.path.join(path_files, "models/rb_ru_tds.pkl"), "rb")),
+             'rushing_yds': pickle.load(open(os.path.join(path_files, "models/rb_ru_yds.pkl"), "rb"))}
 
 # getting the trained te models from the files created by analyze_tes()
-te_models = {'fumbles': pickle.load(open("models/te_fumb.pkl", "rb")),
-             'pass_2pts': pickle.load(open("models/te_pa_2pts.pkl", "rb")),
-             'pass_int': pickle.load(open("models/te_pa_int.pkl", "rb")),
-             'pass_tds': pickle.load(open("models/te_pa_tds.pkl", "rb")),
-             'pass_yds': pickle.load(open("models/te_pa_yds.pkl", "rb")),
-             'recieving_2pts': pickle.load(open("models/te_rec_2pts.pkl", "rb")),
-             'recieving_receptions': pickle.load(open("models/te_rec_receptions.pkl", "rb")),
-             'recieving_tds': pickle.load(open("models/te_rec_tds.pkl", "rb")),
-             'recieving_yds': pickle.load(open("models/te_rec_yds.pkl", "rb")),
-             'rushing_2pts': pickle.load(open("models/te_ru_2pts.pkl", "rb")),
-             'rushing_tds': pickle.load(open("models/te_ru_tds.pkl", "rb")),
-             'rushing_yds': pickle.load(open("models/te_ru_yds.pkl", "rb"))}
+te_models = {'fumbles': pickle.load(open(os.path.join(path_files, "models/te_fumb.pkl"), "rb")),
+             'pass_2pts': pickle.load(open(os.path.join(path_files, "models/te_pa_2pts.pkl"), "rb")),
+             'pass_int': pickle.load(open(os.path.join(path_files, "models/te_pa_int.pkl"), "rb")),
+             'pass_tds': pickle.load(open(os.path.join(path_files, "models/te_pa_tds.pkl"), "rb")),
+             'pass_yds': pickle.load(open(os.path.join(path_files, "models/te_pa_yds.pkl"), "rb")),
+             'recieving_2pts': pickle.load(open(os.path.join(path_files, "models/te_rec_2pts.pkl"), "rb")),
+             'recieving_receptions': pickle.load(open(os.path.join(path_files, "models/te_rec_receptions.pkl"), "rb")),
+             'recieving_tds': pickle.load(open(os.path.join(path_files, "models/te_rec_tds.pkl"), "rb")),
+             'recieving_yds': pickle.load(open(os.path.join(path_files, "models/te_rec_yds.pkl"), "rb")),
+             'rushing_2pts': pickle.load(open(os.path.join(path_files, "models/te_ru_2pts.pkl"), "rb")),
+             'rushing_tds': pickle.load(open(os.path.join(path_files, "models/te_ru_tds.pkl"), "rb")),
+             'rushing_yds': pickle.load(open(os.path.join(path_files, "models/te_ru_yds.pkl"), "rb"))}
 
 # getting the trained te models from the files created by analyze_tes()
-dst_models = {'block': pickle.load(open("models/dst_block.pkl", "rb")),
-              'fum_rec': pickle.load(open("models/dst_fum_rec.pkl", "rb")),
-              'int': pickle.load(open("models/dst_int.pkl", "rb")),
-              'points_allowed': pickle.load(open("models/dst_points_allowed.pkl", "rb")),
-              'sack': pickle.load(open("models/dst_sack.pkl", "rb")),
-              'safeties': pickle.load(open("models/dst_safeties.pkl", "rb")),
-              'tds': pickle.load(open("models/dst_tds.pkl", "rb")),
-              'yards_allowed': pickle.load(open("models/dst_yards_allowed.pkl", "rb"))}
+dst_models = {'block': pickle.load(open(os.path.join(path_files, "models/dst_block.pkl"), "rb")),
+              'fum_rec': pickle.load(open(os.path.join(path_files, "models/dst_fum_rec.pkl"), "rb")),
+              'int': pickle.load(open(os.path.join(path_files, "models/dst_int.pkl"), "rb")),
+              'points_allowed': pickle.load(open(os.path.join(path_files, "models/dst_points_allowed.pkl"), "rb")),
+              'sack': pickle.load(open(os.path.join(path_files, "models/dst_sack.pkl"), "rb")),
+              'safeties': pickle.load(open(os.path.join(path_files, "models/dst_safeties.pkl"), "rb")),
+              'tds': pickle.load(open(os.path.join(path_files, "models/dst_tds.pkl"), "rb")),
+              'yards_allowed': pickle.load(open(os.path.join(path_files, "models/dst_yards_allowed.pkl"), "rb"))}
 
 # getting the trained te models from the files created by analyze_tes()
-k_models = {'fgs': pickle.load(open("models/k_fgs.pkl", "rb")),
-            'xps': pickle.load(open("models/k_xps.pkl", "rb"))}
+k_models = {'fgs': pickle.load(open(os.path.join(path_files, "models/k_fgs.pkl"), "rb")),
+            'xps': pickle.load(open(os.path.join(path_files, "models/k_xps.pkl"), "rb"))}
 
 qb_response = {}
 wr_response = {}
@@ -259,6 +263,7 @@ def calculate_points():
     global opponent_players
     global my_score
     global opponent_score
+    print(my_team)
     for player in my_team:
         if player['position'] == 'QB':
             stats = predict_qb_stats(player['name'], player['team'], player['opponent'], player['home'], week, qb_models)
@@ -297,10 +302,29 @@ def calculate_points():
 
 def grab_players(team):
     '''Grabs my players and my opponents and passes them to dictionaries.'''
+    print(datetime.datetime.now().strftime("%A"))
+    if datetime.datetime.now().strftime("%A") in ['Tuesday', 'Wednesday', 'Thursday']:
+        started = 'preview&previewType'
+    else:
+        started = 'track&trackType'
     url = 'https://fantasy.nfl.com/league/2625883/team/' + str(team)
-    url += '/gamecenter?gameCenterTab=track&trackType=fbs'
+    url += '/gamecenter?gameCenterTab=' + started + '=fbs'
+    print(url)
     req = requests.get(url)
     matchup = BeautifulSoup(req.text, "html.parser")
+
+    global my_team
+    global my_players
+    global my_opponent
+    global opponent_players
+    global my_score
+    global opponent_score
+    my_team = list()
+    my_players = list()
+    my_opponent = list()
+    opponent_players = list()
+    my_score = 0
+    opponent_score = 0
 
     players = matchup.find_all('tr', 'player-QB-0')
     players.extend(matchup.find_all('tr', 'player-RB-0'))
@@ -319,15 +343,26 @@ def grab_players(team):
         em = player.find_all('em')[0]
         em = em.text.split(' - ')
         if len(em) < 2:
-            em = player.find_all('em')[1]
-            em = em.text.split(' - ')
+            try:
+                em = player.find_all('em')[1]
+                em = em.text.split(' - ')
+            except:
+                em = ['none']
         if len(em) < 2:
             position = player.find_all('em')[0].text
             team = name
         else:
             position = em[0]
             team = em[1]
-        opponent = player.find('a', 'opp-fpa').text
+        try:
+            opponent = player.find('a', 'opp-fpa').text
+        except:
+            if mine:
+                mine = False
+            else:
+                mine = True
+            continue
+        print(opponent)
         home = 1
         if opponent[0] == '@':
             opponent = opponent[1:]
@@ -349,29 +384,22 @@ def grab_players(team):
 @app.route('/')
 @app.route('/index')
 def index():
-    return '''
-<html>
-    <head>
-        <title>AI - Fantasy Predictor</title>
-    </head>
-    <body>
-        <h1>Fantasy Matchup Predictor</h1>
-    </body>
-</html>'''
+    teams = {1: 'Clayton', 2: 'Joel', 3: 'Charles', 4: 'Shea', 5: 'Simon',
+             6: 'Christian', 7: 'Sebastian', 8: 'Nicholas', 9: 'Siim',
+             10: 'Tom', 11: 'Mike', 12: 'Julian'}
+    return render_template('index.html', teams=teams)
 
 
-@app.route('/matchup/8')
-def matchup():
-    grab_players(8)
-    return '''
-<html>
-    <head>
-        <title>AI - Fantasy Predictor</title>
-    </head>
-    <body>
-        <h1>Fantasy Matchup Predictor</h1>
-    </body>
-</html>'''
+@app.route('/matchup/<team>')
+def matchup(team):
+    grab_players(team)
+    global my_players
+    global opponent_players
+    global my_score
+    global opponent_score
+    score = round(my_score, 2)
+    o_score=round(opponent_score,2)
+    return render_template('matchup.html', my_players=my_players, opponent_players=opponent_players, my_score=score, opponent_score=o_score)
 
 
 @app.route('/api/qb/<name>/<team>/<opponent>/<home>/<week>')

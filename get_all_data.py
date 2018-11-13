@@ -1,6 +1,7 @@
 import datetime
 import json
 import requests
+import os
 from bs4 import BeautifulSoup
 
 from get_specific_data import get_specific_data
@@ -17,6 +18,8 @@ global end_week
 end_week = 9
 
 positions = ('QB', 'WR', 'RB', 'TE')
+
+path = '/var/www/llfantasy.com/public_html/'
 
 
 def get_all_data():
@@ -43,7 +46,8 @@ def get_all_data():
 
 def set_limits(year, week):
     '''Sets starting week and year.'''
-    filename = 'year_and_weeks.json'
+    global path
+    filename = os.path.join(path, 'year_and_weeks.json')
     with open(filename, 'w') as info_object:
         info = {'year': year, 'week': week}
         json.dump(info, info_object)
@@ -51,7 +55,8 @@ def set_limits(year, week):
 
 def get_limits():
     '''Gets starting week and year, as well as end week and end year.'''
-    filename = 'year_and_weeks.json'
+    global path
+    filename = os.path.join(path, 'year_and_weeks.json')
     with open(filename) as info_object:
         info = json.load(info_object)
         print(info)

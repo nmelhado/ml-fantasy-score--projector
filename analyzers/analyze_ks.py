@@ -1,8 +1,11 @@
 import pandas
 import pickle
 import io
+import os
 import csv
 from sklearn import linear_model
+
+path_files = '/var/www/llfantasy.com/public_html/'
 
 
 def analyze_ks():
@@ -10,7 +13,7 @@ def analyze_ks():
     players = {}
     teams = {}
     opponents = {}
-    with open('data/k_data.csv') as f:
+    with open(os.path.join(path_files, 'data/k_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             players[row['name']] = 0
@@ -18,7 +21,7 @@ def analyze_ks():
             opponents[row['opponent']] = 0
     f.close()
 
-    with io.open('computed/k_data.csv', 'w', newline='') as stat_file:
+    with io.open(os.path.join(path_files, 'computed/k_data.csv'), 'w', newline='') as stat_file:
         stat_writer = csv.writer(stat_file)
         cats = ['year', 'week']
         for k, v in players.items():
@@ -29,7 +32,7 @@ def analyze_ks():
             cats.append(k)
         cats.extend(['home', 'xps', 'fgs', 'fantasy points'])
         stat_writer.writerow(cats)
-        with open('data/k_data.csv') as f:
+        with open(os.path.join(path_files, 'data/k_data.csv')) as f:
             reader = csv.DictReader(f, delimiter=',')
             for row in reader:
                 players[row['name']] = 1
@@ -52,7 +55,7 @@ def analyze_ks():
         f.close()
     stat_file.close()
     # loading the data as a panda
-    df = pandas.read_csv('computed/k_data.csv', delimiter=",")
+    df = pandas.read_csv(os.path.join(path_files, 'computed/k_data.csv'), delimiter=",")
 
     # getting the dvs
     labels = ['xps', 'fgs']
@@ -68,4 +71,4 @@ def analyze_ks():
         regr.fit(features, dv)
 
         # serializing the model to a file
-        pickle.dump(regr, open("models/k_" + label + ".pkl", "wb"))
+        pickle.dump(regr, open(os.path.join(path_files, "models/k_" + label + ".pkl"), "wb"))

@@ -1,8 +1,30 @@
 <html>
     <head>
         <title>AI - Fantasy Predictor</title>
+        <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="{{ url_for('static', filename='css/main.css') }}">
+		<script src="{{ url_for('static', filename='jquery-3.2.1.js') }}"></script>
     </head>
     <body>
-        <h1>Fantasy Matchup Predictor</h1>
+        <div id="loadingBack" style="position: fixed; width: 100%; height: 100%; background-color: rgba(200, 200, 200, .7); z-index: 5;"></div>
+        <img src="{{ url_for('static', filename='loading.gif') }}" style="position: fixed; left: calc(50% - 125px); top: calc(50% - 125px); z-index: 6;" id="loading"/>
+        <a href="../"><h1>Fantasy Matchup Predictor</h1></a>
+        <h2>Choose a Team</h2>
+        <div id="tables">
+            <ul>
+                {% for num, team in teams.items() %}
+                    <a href="/matchup/{{ num }}"><li>{{ team }}</li></a>
+                {% endfor %}
+            </ul>
+        </div>
     </body>
+    <script>
+        $('#loadingBack').hide();
+        $('#loading').hide();
+        $(document).ready(function() {
+            $('a').click(function() {
+                $('#loadingBack').show();
+                $('#loading').show();
+            });
+        })
+    </script>
 </html>

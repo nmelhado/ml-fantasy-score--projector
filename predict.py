@@ -1,4 +1,8 @@
 import csv
+import os
+import numpy as np
+
+path_files = '/var/www/llfantasy.com/public_html/'
 
 
 def evaluate_qb(name, team, opponent, home, week, model, stat, qb_stats):
@@ -6,7 +10,7 @@ def evaluate_qb(name, team, opponent, home, week, model, stat, qb_stats):
     players = {}
     teams = {}
     opponents = {}
-    with open('data/qb_data.csv') as f:
+    with open(os.path.join(path_files, 'data/qb_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             players[row['name']] = 0
@@ -27,6 +31,7 @@ def evaluate_qb(name, team, opponent, home, week, model, stat, qb_stats):
     ivs.append(int(home))
     # the model generates a predicted performance
     # ivs = np.array(ivs)
+    print(ivs)
     prediction = model.predict([ivs])
     # preparing a response object and storing the model's predictions
     qb_stats[stat] = float(prediction)
@@ -38,7 +43,7 @@ def evaluate_wr(name, team, opponent, home, week, model, stat, wr_stats):
     players = {}
     teams = {}
     opponents = {}
-    with open('data/wr_data.csv') as f:
+    with open(os.path.join(path_files, 'data/wr_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             players[row['name']] = 0
@@ -70,7 +75,7 @@ def evaluate_rb(name, team, opponent, home, week, model, stat, rb_stats):
     players = {}
     teams = {}
     opponents = {}
-    with open('data/rb_data.csv') as f:
+    with open(os.path.join(path_files, 'data/rb_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             players[row['name']] = 0
@@ -102,7 +107,7 @@ def evaluate_te(name, team, opponent, home, week, model, stat, te_stats):
     players = {}
     teams = {}
     opponents = {}
-    with open('data/te_data.csv') as f:
+    with open(os.path.join(path_files, 'data/te_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             players[row['name']] = 0
@@ -134,7 +139,7 @@ def evaluate_k(name, team, opponent, home, week, model, stat, k_stats):
     players = {}
     teams = {}
     opponents = {}
-    with open('data/k_data.csv') as f:
+    with open(os.path.join(path_files, 'data/k_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             players[row['name']] = 0
@@ -165,7 +170,7 @@ def evaluate_dst(team, opponent, home, week, model, stat, dst_stats):
     '''Creates a prediction, based on the ivs provided and a model.'''
     teams = {}
     opponents = {}
-    with open('data/dst_data.csv') as f:
+    with open(os.path.join(path_files, 'data/dst_data.csv')) as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             teams[row['team']] = 0
@@ -203,8 +208,9 @@ def predict_qb_stats(name, team, opponent, home, week, models):
     qb_stats['name'] = name
     qb_stats['team'] = team
     qb_stats['opponent'] = opponent
+    qb_stats['position'] = 'QB'
     qb_stats['home'] = 'home' if home > 0 else 'away'
-    qb_stats['fantasy points'] = points
+    qb_stats['fantasy points'] = round(points,2)
     # sending our response object back as json
     return qb_stats
 
@@ -224,8 +230,9 @@ def predict_wr_stats(name, team, opponent, home, week, models):
     wr_stats['name'] = name
     wr_stats['team'] = team
     wr_stats['opponent'] = opponent
+    wr_stats['position'] = 'WR'
     wr_stats['home'] = 'home' if home > 0 else 'away'
-    wr_stats['fantasy points'] = points
+    wr_stats['fantasy points'] = round(points,2)
     # sending our response object back as json
     return wr_stats
 
@@ -245,8 +252,9 @@ def predict_rb_stats(name, team, opponent, home, week, models):
     rb_stats['name'] = name
     rb_stats['team'] = team
     rb_stats['opponent'] = opponent
+    rb_stats['position'] = 'RB'
     rb_stats['home'] = 'home' if home > 0 else 'away'
-    rb_stats['fantasy points'] = points
+    rb_stats['fantasy points'] = round(points,2)
     # sending our response object back as json
     return rb_stats
 
@@ -266,8 +274,9 @@ def predict_te_stats(name, team, opponent, home, week, models):
     te_stats['name'] = name
     te_stats['team'] = team
     te_stats['opponent'] = opponent
+    te_stats['position'] = 'TE'
     te_stats['home'] = 'home' if home > 0 else 'away'
-    te_stats['fantasy points'] = points
+    te_stats['fantasy points'] = round(points,2)
     # sending our response object back as json
     return te_stats
 
@@ -282,8 +291,9 @@ def predict_k_stats(name, team, opponent, home, week, models):
     k_stats['name'] = name
     k_stats['team'] = team
     k_stats['opponent'] = opponent
+    k_stats['position'] = 'K'
     k_stats['home'] = 'home' if home > 0 else 'away'
-    k_stats['fantasy points'] = points
+    k_stats['fantasy points'] = round(points,2)
     # sending our response object back as json
     return k_stats
 
@@ -319,9 +329,11 @@ def predict_dst_stats(team, opponent, home, week, models):
     points += (dst_stats['block'] * 2) + (dst_stats['tds'] * 6)
     points += pa + payds
 
+    dst_stats['name'] = team
     dst_stats['team'] = team
     dst_stats['opponent'] = opponent
+    dst_stats['position'] = 'DEF'
     dst_stats['home'] = 'home' if home > 0 else 'away'
-    dst_stats['fantasy points'] = points
+    dst_stats['fantasy points'] = round(points,2)
     # sending our response object back as json
     return dst_stats
