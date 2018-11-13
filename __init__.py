@@ -8,14 +8,19 @@ import inspect
 import csv
 import requests
 from bs4 import BeautifulSoup
-from .get_all_data import get_all_data, get_limits
-from .analyzers.analyze_qbs import analyze_qbs
-from .analyzers.analyze_rbs import analyze_rbs
-from .analyzers.analyze_wrs import analyze_wrs
-from .analyzers.analyze_tes import analyze_tes
-from .analyzers.analyze_dsts import analyze_dsts
-from .analyzers.analyze_ks import analyze_ks
-from .predict import predict_qb_stats, predict_wr_stats, predict_rb_stats, predict_te_stats, predict_k_stats, predict_dst_stats
+
+path = '/var/www/nmfantasy.com/public_html/'
+if path not in sys.path:
+    sys.path.append(path)
+
+from get_all_data import get_all_data, get_limits
+from analyzers.analyze_qbs import analyze_qbs
+from analyzers.analyze_rbs import analyze_rbs
+from analyzers.analyze_wrs import analyze_wrs
+from analyzers.analyze_tes import analyze_tes
+from analyzers.analyze_dsts import analyze_dsts
+from analyzers.analyze_ks import analyze_ks
+from predict import predict_qb_stats, predict_wr_stats, predict_rb_stats, predict_te_stats, predict_k_stats, predict_dst_stats
 
 app = Flask(__name__)
 
@@ -355,8 +360,9 @@ def index():
 </html>'''
 
 
-@app.route('/matchup')
+@app.route('/matchup/8')
 def matchup():
+    grab_players(8)
     return '''
 <html>
     <head>
@@ -442,3 +448,6 @@ def te_prediction(name, team, opponent, home, week):
     te_response['fantasy points'] = points
     # sending our response object back as json
     return jsonify(te_response)
+
+if __name__ == "__main__":
+    app.run()

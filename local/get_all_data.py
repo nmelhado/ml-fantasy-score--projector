@@ -1,0 +1,1 @@
+/var/www/nmfantasy.com/public_html/get_all_data.py

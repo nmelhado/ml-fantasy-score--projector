@@ -3,9 +3,9 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
-from .get_specific_data import get_specific_data
-from .get_dst_data import get_dst_data
-from .get_k_data import get_k_data
+from get_specific_data import get_specific_data
+from get_dst_data import get_dst_data
+from get_k_data import get_k_data
 
 global week
 week = 9

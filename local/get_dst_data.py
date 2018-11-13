@@ -1,0 +1,1 @@
+/var/www/nmfantasy.com/public_html/get_dst_data.py
