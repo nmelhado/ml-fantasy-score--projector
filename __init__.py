@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import jsonify
+from flask import render_template
 import pickle
 import numpy as np
 import os
@@ -8,11 +9,6 @@ import inspect
 import csv
 import requests
 from bs4 import BeautifulSoup
-
-path = '/var/www/nmfantasy.com/public_html/'
-if path not in sys.path:
-    sys.path.append(path)
-
 from get_all_data import get_all_data, get_limits
 from analyzers.analyze_qbs import analyze_qbs
 from analyzers.analyze_rbs import analyze_rbs
@@ -289,10 +285,6 @@ def calculate_points():
             stats = predict_dst_stats(player['team'], player['opponent'], player['home'], week, dst_models)
         opponent_players.append(stats)
         opponent_score += stats['fantasy points']
-    print(my_score)
-    print(my_players)
-    print(opponent_score)
-    print(opponent_players)
 
 
 def grab_players(team):
@@ -360,18 +352,14 @@ def index():
 </html>'''
 
 
-@app.route('/matchup/8')
-def matchup():
-    grab_players(8)
-    return '''
-<html>
-    <head>
-        <title>AI - Fantasy Predictor</title>
-    </head>
-    <body>
-        <h1>Fantasy Matchup Predictor</h1>
-    </body>
-</html>'''
+@app.route('/matchup/<team>')
+def matchup(team):
+    grab_players(team)
+    global my_players
+    global opponent_players
+    global my_score
+    global opponent_score
+    return render_template('matchup.html', my_players=my_players, opponent_players=opponent_players, my_score=my_score, opponent_score=opponent_score)
 
 
 @app.route('/api/qb/<name>/<team>/<opponent>/<home>/<week>')

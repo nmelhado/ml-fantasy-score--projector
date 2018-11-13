@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <title>AI - Fantasy Predictor</title>
+        <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="{{ url_for('static', filename='css/main.css') }}">
+    </head>
+    <body>
+        <h1>Fantasy Matchup Predictor</h1>
+        <div id="headings">
+            <h3>My Team</h3>
+            <h3>My Opponent's Team</h3>
+        </div>
+        <div id="tables">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Team</th>
+                        <th>Opponent</th>
+                        <th>Projected Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in my_players %}
+                        <tr>
+                            <td>{{ player['name'] }}</td>
+                            <td>{{ player['position'] }}</td>
+                            <td>{{ player['team'] }}</td>
+                            <td>{{ player['opponent'] }}</td>
+                            <td>{{ player['fantasy points'] }}</td>
+                        </tr>
+                    {% endfor %}  
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Team</th>
+                        <th>Opponent</th>
+                        <th>Projected Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in opponent_players %}
+                        <tr>
+                            <td>{{ player['name'] }}</td>
+                            <td>{{ player['position'] }}</td>
+                            <td>{{ player['team'] }}</td>
+                            <td>{{ player['opponent'] }}</td>
+                            <td>{{ player['fantasy points'] }}</td>
+                        </tr>
+                    {% endfor %}  
+                </tbody>
+            </table>
+        </div>
+        <p id="scores">Predicted Outcome<br>{{round(my_score, 2)}}   vs.   {{round(opponent_score, 2)}}</p>
+    </body>
+</html>

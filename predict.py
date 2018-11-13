@@ -203,6 +203,7 @@ def predict_qb_stats(name, team, opponent, home, week, models):
     qb_stats['name'] = name
     qb_stats['team'] = team
     qb_stats['opponent'] = opponent
+    qb_stats['position'] = 'QB'
     qb_stats['home'] = 'home' if home > 0 else 'away'
     qb_stats['fantasy points'] = points
     # sending our response object back as json
@@ -224,6 +225,7 @@ def predict_wr_stats(name, team, opponent, home, week, models):
     wr_stats['name'] = name
     wr_stats['team'] = team
     wr_stats['opponent'] = opponent
+    wr_stats['position'] = 'WR'
     wr_stats['home'] = 'home' if home > 0 else 'away'
     wr_stats['fantasy points'] = points
     # sending our response object back as json
@@ -245,6 +247,7 @@ def predict_rb_stats(name, team, opponent, home, week, models):
     rb_stats['name'] = name
     rb_stats['team'] = team
     rb_stats['opponent'] = opponent
+    rb_stats['position'] = 'RB'
     rb_stats['home'] = 'home' if home > 0 else 'away'
     rb_stats['fantasy points'] = points
     # sending our response object back as json
@@ -266,6 +269,7 @@ def predict_te_stats(name, team, opponent, home, week, models):
     te_stats['name'] = name
     te_stats['team'] = team
     te_stats['opponent'] = opponent
+    te_stats['position'] = 'TE'
     te_stats['home'] = 'home' if home > 0 else 'away'
     te_stats['fantasy points'] = points
     # sending our response object back as json
@@ -282,6 +286,7 @@ def predict_k_stats(name, team, opponent, home, week, models):
     k_stats['name'] = name
     k_stats['team'] = team
     k_stats['opponent'] = opponent
+    k_stats['position'] = 'K'
     k_stats['home'] = 'home' if home > 0 else 'away'
     k_stats['fantasy points'] = points
     # sending our response object back as json
@@ -319,8 +324,10 @@ def predict_dst_stats(team, opponent, home, week, models):
     points += (dst_stats['block'] * 2) + (dst_stats['tds'] * 6)
     points += pa + payds
 
+    dst_stats['name'] = team
     dst_stats['team'] = team
     dst_stats['opponent'] = opponent
+    dst_stats['position'] = 'DEF'
     dst_stats['home'] = 'home' if home > 0 else 'away'
     dst_stats['fantasy points'] = points
     # sending our response object back as json

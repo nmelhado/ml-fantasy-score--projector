@@ -54,7 +54,6 @@ def get_limits():
     filename = 'year_and_weeks.json'
     with open(filename) as info_object:
         info = json.load(info_object)
-        print(info)
         global year
         year = info['year']
         global week
